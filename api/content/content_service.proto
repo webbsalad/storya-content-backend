@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package content;
+
+import "api/content/content.proto";
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/webbsalad/storya-content-backend/content;content";
+
+
+service ContentService {
+    rpc Get(ItemID) returns (Item) {
+        option (google.api.http) = {
+            get: "/items/{item_id}"
+        };
+    };
+  
+    rpc Create(CreateItemRequest) returns (Item) {
+        option (google.api.http) = {
+            post: "/items",
+            body: "*"
+        };
+    };
+  
+    rpc Update(UpdateItemRequest) returns (Item) {
+        option (google.api.http) = {
+            patch: "/items/{item_id}",
+            body: "*"
+        };
+    };
+  
+    rpc Delete(ItemID) returns (google.protobuf.Empty) { 
+        option (google.api.http) = {
+            delete: "/items"
+        };
+    };
+};
+
+
+message ItemID {
+    string item_id = 1;
+}
+
+message CreateItemRequest {
+    string title = 1;
+    int32 year = 2;
+    ItemType type = 3;
+    repeated string tag_ids = 4;
+}
+
+message UpdateItemRequest {
+    string item_id = 1;
+    string title = 2;
+    int32 year = 3;
+    ItemType type = 4;
+    repeated string tag_ids = 5;
+}

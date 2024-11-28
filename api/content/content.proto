@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package content;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/webbsalad/storya-content-backend/content;content";
+
+enum ItemType {
+    UNSPECIFIED = 0;
+    GAME = 1;
+    BOOK = 2;
+    MOVIE = 3;
+}
+
+message Tag {
+    string id = 1;
+    string name = 2;
+}
+
+message Item {
+    string id = 1;
+    string title = 2;
+    int32 year = 3;
+    ItemType type = 4;
+    google.protobuf.Timestamp created_at = 5;
+    repeated Tag tags = 6;
+}
