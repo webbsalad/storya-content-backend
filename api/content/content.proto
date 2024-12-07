@@ -3,6 +3,7 @@ syntax = "proto3";
 package content;
 
 import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
 
 option go_package = "github.com/webbsalad/storya-content-backend/content;content";
 
@@ -19,7 +20,7 @@ message Tag {
 }
 
 message Item {
-    string id = 1;
+    string id = 1 [(validate.rules).string.uuid = true];
     string title = 2;
     int32 year = 3;
     ItemType type = 4;

@@ -11,9 +11,15 @@ option go_package = "github.com/webbsalad/storya-content-backend/content;content
 
 
 service ContentService {
-    rpc Get(ItemID) returns (Item) {
+    rpc Get(GetItemRequest) returns (Item) {
         option (google.api.http) = {
             get: "/items/{item_id}"
+        };
+    };
+
+    rpc GetList(GetListRequest) returns (GetListResponse) {
+        option (google.api.http) = {
+            get: "/items/{count}"
         };
     };
   
@@ -31,7 +37,7 @@ service ContentService {
         };
     };
   
-    rpc Delete(ItemID) returns (google.protobuf.Empty) { 
+    rpc Delete(DeleteItemRequest) returns (google.protobuf.Empty) { 
         option (google.api.http) = {
             delete: "/items"
         };
@@ -39,8 +45,16 @@ service ContentService {
 };
 
 
-message ItemID {
-    string item_id = 1;
+message GetItemRequest {
+    string item_id = 1 [(validate.rules).string.uuid = true];
+}
+
+message GetListRequest {
+    int32 count = 1;
+}
+
+message GetListResponse {
+    repeated Item item = 1;
 }
 
 message CreateItemRequest {
@@ -51,9 +65,13 @@ message CreateItemRequest {
 }
 
 message UpdateItemRequest {
-    string item_id = 1;
+    string item_id = 1 [(validate.rules).string.uuid = true];
     string title = 2;
     int32 year = 3;
     ItemType type = 4;
     repeated string tag_ids = 5;
+}
+
+message DeleteItemRequest {
+    string item_id = 1 [(validate.rules).string.uuid = true];
 }

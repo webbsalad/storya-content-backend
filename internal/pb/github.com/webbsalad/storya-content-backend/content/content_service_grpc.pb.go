@@ -20,20 +20,22 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ContentService_Get_FullMethodName    = "/content.ContentService/Get"
-	ContentService_Create_FullMethodName = "/content.ContentService/Create"
-	ContentService_Update_FullMethodName = "/content.ContentService/Update"
-	ContentService_Delete_FullMethodName = "/content.ContentService/Delete"
+	ContentService_Get_FullMethodName     = "/content.ContentService/Get"
+	ContentService_GetList_FullMethodName = "/content.ContentService/GetList"
+	ContentService_Create_FullMethodName  = "/content.ContentService/Create"
+	ContentService_Update_FullMethodName  = "/content.ContentService/Update"
+	ContentService_Delete_FullMethodName  = "/content.ContentService/Delete"
 )
 
 // ContentServiceClient is the client API for ContentService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ContentServiceClient interface {
-	Get(ctx context.Context, in *ItemID, opts ...grpc.CallOption) (*Item, error)
+	Get(ctx context.Context, in *GetItemRequest, opts ...grpc.CallOption) (*Item, error)
+	GetList(ctx context.Context, in *GetListRequest, opts ...grpc.CallOption) (*GetListResponse, error)
 	Create(ctx context.Context, in *CreateItemRequest, opts ...grpc.CallOption) (*Item, error)
 	Update(ctx context.Context, in *UpdateItemRequest, opts ...grpc.CallOption) (*Item, error)
-	Delete(ctx context.Context, in *ItemID, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Delete(ctx context.Context, in *DeleteItemRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type contentServiceClient struct {
@@ -44,10 +46,20 @@ func NewContentServiceClient(cc grpc.ClientConnInterface) ContentServiceClient {
 	return &contentServiceClient{cc}
 }
 
-func (c *contentServiceClient) Get(ctx context.Context, in *ItemID, opts ...grpc.CallOption) (*Item, error) {
+func (c *contentServiceClient) Get(ctx context.Context, in *GetItemRequest, opts ...grpc.CallOption) (*Item, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Item)
 	err := c.cc.Invoke(ctx, ContentService_Get_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) GetList(ctx context.Context, in *GetListRequest, opts ...grpc.CallOption) (*GetListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetListResponse)
+	err := c.cc.Invoke(ctx, ContentService_GetList_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +86,7 @@ func (c *contentServiceClient) Update(ctx context.Context, in *UpdateItemRequest
 	return out, nil
 }
 
-func (c *contentServiceClient) Delete(ctx context.Context, in *ItemID, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *contentServiceClient) Delete(ctx context.Context, in *DeleteItemRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, ContentService_Delete_FullMethodName, in, out, cOpts...)
@@ -88,10 +100,11 @@ func (c *contentServiceClient) Delete(ctx context.Context, in *ItemID, opts ...g
 // All implementations must embed UnimplementedContentServiceServer
 // for forward compatibility.
 type ContentServiceServer interface {
-	Get(context.Context, *ItemID) (*Item, error)
+	Get(context.Context, *GetItemRequest) (*Item, error)
+	GetList(context.Context, *GetListRequest) (*GetListResponse, error)
 	Create(context.Context, *CreateItemRequest) (*Item, error)
 	Update(context.Context, *UpdateItemRequest) (*Item, error)
-	Delete(context.Context, *ItemID) (*emptypb.Empty, error)
+	Delete(context.Context, *DeleteItemRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedContentServiceServer()
 }
 
@@ -102,8 +115,11 @@ type ContentServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedContentServiceServer struct{}
 
-func (UnimplementedContentServiceServer) Get(context.Context, *ItemID) (*Item, error) {
+func (UnimplementedContentServiceServer) Get(context.Context, *GetItemRequest) (*Item, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
+func (UnimplementedContentServiceServer) GetList(context.Context, *GetListRequest) (*GetListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetList not implemented")
 }
 func (UnimplementedContentServiceServer) Create(context.Context, *CreateItemRequest) (*Item, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
@@ -111,7 +127,7 @@ func (UnimplementedContentServiceServer) Create(context.Context, *CreateItemRequ
 func (UnimplementedContentServiceServer) Update(context.Context, *UpdateItemRequest) (*Item, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
 }
-func (UnimplementedContentServiceServer) Delete(context.Context, *ItemID) (*emptypb.Empty, error) {
+func (UnimplementedContentServiceServer) Delete(context.Context, *DeleteItemRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
 func (UnimplementedContentServiceServer) mustEmbedUnimplementedContentServiceServer() {}
@@ -136,7 +152,7 @@ func RegisterContentServiceServer(s grpc.ServiceRegistrar, srv ContentServiceSer
 }
 
 func _ContentService_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ItemID)
+	in := new(GetItemRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -148,7 +164,25 @@ func _ContentService_Get_Handler(srv interface{}, ctx context.Context, dec func(
 		FullMethod: ContentService_Get_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServiceServer).Get(ctx, req.(*ItemID))
+		return srv.(ContentServiceServer).Get(ctx, req.(*GetItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_GetList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).GetList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_GetList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).GetList(ctx, req.(*GetListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -190,7 +224,7 @@ func _ContentService_Update_Handler(srv interface{}, ctx context.Context, dec fu
 }
 
 func _ContentService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ItemID)
+	in := new(DeleteItemRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -202,7 +236,7 @@ func _ContentService_Delete_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: ContentService_Delete_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServiceServer).Delete(ctx, req.(*ItemID))
+		return srv.(ContentServiceServer).Delete(ctx, req.(*DeleteItemRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -217,6 +251,10 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Get",
 			Handler:    _ContentService_Get_Handler,
+		},
+		{
+			MethodName: "GetList",
+			Handler:    _ContentService_GetList_Handler,
 		},
 		{
 			MethodName: "Create",
