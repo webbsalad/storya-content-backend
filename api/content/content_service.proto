@@ -13,13 +13,19 @@ option go_package = "github.com/webbsalad/storya-content-backend/content;content
 service ContentService {
     rpc Get(GetItemRequest) returns (Item) {
         option (google.api.http) = {
-            get: "/items/{item_id}"
+            get: "/items/{content_type}/{item_id}"
         };
     };
 
     rpc GetList(GetListRequest) returns (GetListResponse) {
         option (google.api.http) = {
-            get: "/items/{count}"
+            get: "/items/{content_type}/{user_id}"
+        };
+    };
+
+    rpc GetRand(GetRandRequest) returns (GetRandResponse) {
+        option (google.api.http) = {
+            get: "/items/{content_type}/{count}"
         };
     };
   
@@ -47,20 +53,31 @@ service ContentService {
 
 message GetItemRequest {
     string item_id = 1 [(validate.rules).string.uuid = true];
+    ContentType content_type = 2;
 }
 
 message GetListRequest {
-    int32 count = 1;
+    string user_id = 1 [(validate.rules).string.uuid = true];
+    ContentType content_type = 2;
 }
 
 message GetListResponse {
     repeated Item item = 1;
 }
 
+message GetRandRequest {
+    ContentType content_type = 1;
+    int32 count = 2;
+}
+
+message GetRandResponse {
+    repeated Item item = 1;
+}
+
 message CreateItemRequest {
     string title = 1;
     int32 year = 2;
-    ItemType type = 3;
+    ContentType type = 3;
     repeated string tag_ids = 4;
 }
 
@@ -68,7 +85,7 @@ message UpdateItemRequest {
     string item_id = 1 [(validate.rules).string.uuid = true];
     string title = 2;
     int32 year = 3;
-    ItemType type = 4;
+    ContentType type = 4;
     repeated string tag_ids = 5;
 }
 
