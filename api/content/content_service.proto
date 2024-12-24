@@ -62,7 +62,7 @@ message GetListRequest {
 }
 
 message GetListResponse {
-    repeated Item item = 1;
+    repeated Item items = 1;
 }
 
 message GetRandRequest {
@@ -71,7 +71,7 @@ message GetRandRequest {
 }
 
 message GetRandResponse {
-    repeated Item item = 1;
+    repeated Item items = 1;
 }
 
 message CreateItemRequest {

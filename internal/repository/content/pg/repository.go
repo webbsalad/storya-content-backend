@@ -88,3 +88,93 @@ func (r *Repository) Get(ctx context.Context, itemID model.ItemID, contentType m
 
 	return item, nil
 }
+
+func (r *Repository) GetList(ctx context.Context, userID model.UserID, contentType model.ContentType) ([]model.Item, error) {
+	table := FromContentTypeToString(contentType)
+	var contentIDs []string
+	var items []model.Item
+
+	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+	contentQuery := psql.
+		Select("content_id").
+		From("user_content").
+		Where(
+			sq.Eq{"user_id": userID.String(), "content_type": table},
+		)
+
+	q, args, err := contentQuery.ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("build content query: %w", err)
+	}
+
+	if err = r.db.SelectContext(ctx, &contentIDs, q, args...); err != nil {
+		return nil, fmt.Errorf("get content IDs: %w", err)
+	}
+
+	for _, contentID := range contentIDs {
+		var storedItem Item
+		var tagIDs []string
+		var storedTags []Tag
+
+		itemQuery := psql.
+			Select("*").
+			From(table).
+			Where(
+				sq.Eq{"id": contentID},
+			)
+
+		q, args, err = itemQuery.ToSql()
+		if err != nil {
+			return nil, fmt.Errorf("build item query: %w", err)
+		}
+
+		if err = r.db.GetContext(ctx, &storedItem, q, args...); err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				continue
+			}
+			return nil, fmt.Errorf("get item: %w", err)
+		}
+
+		tagsQuery := psql.
+			Select("tag_id").
+			From(fmt.Sprintf("%s_tags", table)).
+			Where(
+				sq.Eq{fmt.Sprintf("%s_id", table): contentID},
+			)
+
+		q, args, err = tagsQuery.ToSql()
+		if err != nil {
+			return nil, fmt.Errorf("build tags query: %w", err)
+		}
+
+		if err = r.db.SelectContext(ctx, &tagIDs, q, args...); err != nil {
+			return nil, fmt.Errorf("get tag IDs: %w", err)
+		}
+
+		tagsDetailsQuery := psql.
+			Select("id", "name").
+			From("tag").
+			Where(
+				sq.Eq{"id": tagIDs},
+			)
+
+		q, args, err = tagsDetailsQuery.ToSql()
+		if err != nil {
+			return nil, fmt.Errorf("build tags details query: %w", err)
+		}
+
+		if err = r.db.SelectContext(ctx, &storedTags, q, args...); err != nil {
+			return nil, fmt.Errorf("get tag details: %w", err)
+		}
+
+		item, err := toItemFromDB(storedItem, storedTags)
+		if err != nil {
+			return nil, fmt.Errorf("convert to model item: %w", err)
+		}
+
+		item.Type = contentType
+		items = append(items, item)
+	}
+
+	return items, nil
+}

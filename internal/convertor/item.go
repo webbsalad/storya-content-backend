@@ -16,3 +16,11 @@ func ToDescFromItem(in model.Item) *content.Item {
 		Tags:      toDescFromTags(in.Tags),
 	}
 }
+
+func ToDescFromItems(in []model.Item) []*content.Item {
+	items := make([]*content.Item, len(in))
+	for i, item := range in {
+		items[i] = ToDescFromItem(item)
+	}
+	return items
+}

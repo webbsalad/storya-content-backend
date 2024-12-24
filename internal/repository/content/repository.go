@@ -8,4 +8,5 @@ import (
 
 type Repository interface {
 	Get(ctx context.Context, itemID model.ItemID, contentType model.ContentType) (model.Item, error)
+	GetList(ctx context.Context, userID model.UserID, contentType model.ContentType) ([]model.Item, error)
 }
