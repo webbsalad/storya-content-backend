@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	ContentService_Get_FullMethodName     = "/content.ContentService/Get"
 	ContentService_GetList_FullMethodName = "/content.ContentService/GetList"
+	ContentService_GetRand_FullMethodName = "/content.ContentService/GetRand"
 	ContentService_Create_FullMethodName  = "/content.ContentService/Create"
 	ContentService_Update_FullMethodName  = "/content.ContentService/Update"
 	ContentService_Delete_FullMethodName  = "/content.ContentService/Delete"
@@ -33,6 +34,7 @@ const (
 type ContentServiceClient interface {
 	Get(ctx context.Context, in *GetItemRequest, opts ...grpc.CallOption) (*Item, error)
 	GetList(ctx context.Context, in *GetListRequest, opts ...grpc.CallOption) (*GetListResponse, error)
+	GetRand(ctx context.Context, in *GetRandRequest, opts ...grpc.CallOption) (*GetRandResponse, error)
 	Create(ctx context.Context, in *CreateItemRequest, opts ...grpc.CallOption) (*Item, error)
 	Update(ctx context.Context, in *UpdateItemRequest, opts ...grpc.CallOption) (*Item, error)
 	Delete(ctx context.Context, in *DeleteItemRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -60,6 +62,16 @@ func (c *contentServiceClient) GetList(ctx context.Context, in *GetListRequest, 
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetListResponse)
 	err := c.cc.Invoke(ctx, ContentService_GetList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentServiceClient) GetRand(ctx context.Context, in *GetRandRequest, opts ...grpc.CallOption) (*GetRandResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetRandResponse)
+	err := c.cc.Invoke(ctx, ContentService_GetRand_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -102,6 +114,7 @@ func (c *contentServiceClient) Delete(ctx context.Context, in *DeleteItemRequest
 type ContentServiceServer interface {
 	Get(context.Context, *GetItemRequest) (*Item, error)
 	GetList(context.Context, *GetListRequest) (*GetListResponse, error)
+	GetRand(context.Context, *GetRandRequest) (*GetRandResponse, error)
 	Create(context.Context, *CreateItemRequest) (*Item, error)
 	Update(context.Context, *UpdateItemRequest) (*Item, error)
 	Delete(context.Context, *DeleteItemRequest) (*emptypb.Empty, error)
@@ -120,6 +133,9 @@ func (UnimplementedContentServiceServer) Get(context.Context, *GetItemRequest) (
 }
 func (UnimplementedContentServiceServer) GetList(context.Context, *GetListRequest) (*GetListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetList not implemented")
+}
+func (UnimplementedContentServiceServer) GetRand(context.Context, *GetRandRequest) (*GetRandResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRand not implemented")
 }
 func (UnimplementedContentServiceServer) Create(context.Context, *CreateItemRequest) (*Item, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
@@ -183,6 +199,24 @@ func _ContentService_GetList_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContentServiceServer).GetList(ctx, req.(*GetListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ContentService_GetRand_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRandRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).GetRand(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_GetRand_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).GetRand(ctx, req.(*GetRandRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -255,6 +289,10 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetList",
 			Handler:    _ContentService_GetList_Handler,
+		},
+		{
+			MethodName: "GetRand",
+			Handler:    _ContentService_GetRand_Handler,
 		},
 		{
 			MethodName: "Create",

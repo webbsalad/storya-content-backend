@@ -19,7 +19,13 @@ service ContentService {
 
     rpc GetList(GetListRequest) returns (GetListResponse) {
         option (google.api.http) = {
-            get: "/items/{count}"
+            get: "/items/{content_type}/{user_id}"
+        };
+    };
+
+    rpc GetRand(GetRandRequest) returns (GetRandResponse) {
+        option (google.api.http) = {
+            get: "/items/{content_type}/{count}"
         };
     };
   
@@ -51,10 +57,20 @@ message GetItemRequest {
 }
 
 message GetListRequest {
-    int32 count = 1;
+    string user_id = 1 [(validate.rules).string.uuid = true];
+    ContentType content_type = 2;
 }
 
 message GetListResponse {
+    repeated Item item = 1;
+}
+
+message GetRandRequest {
+    ContentType content_type = 1;
+    int32 count = 2;
+}
+
+message GetRandResponse {
     repeated Item item = 1;
 }
 
