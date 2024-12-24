@@ -31,7 +31,9 @@ func (r *Repository) Get(ctx context.Context, itemID model.ItemID, contentType m
 	itemQuery := psql.
 		Select("*").
 		From(table).
-		Where(sq.Eq{"id": itemID.String()})
+		Where(
+			sq.Eq{"id": itemID.String()},
+		)
 
 	q, args, err := itemQuery.ToSql()
 	if err != nil {
@@ -48,7 +50,9 @@ func (r *Repository) Get(ctx context.Context, itemID model.ItemID, contentType m
 	tagsQuery := psql.
 		Select("tag_id").
 		From(fmt.Sprintf("%s_tags", table)).
-		Where(sq.Eq{"movie_id": itemID.String()})
+		Where(
+			sq.Eq{fmt.Sprintf("%s_id", table): itemID.String()},
+		)
 
 	q, args, err = tagsQuery.ToSql()
 	if err != nil {
@@ -62,7 +66,9 @@ func (r *Repository) Get(ctx context.Context, itemID model.ItemID, contentType m
 	tagsDetailsQuery := psql.
 		Select("id", "name").
 		From("tag").
-		Where(sq.Eq{"id": tagIDs})
+		Where(
+			sq.Eq{"id": tagIDs},
+		)
 
 	q, args, err = tagsDetailsQuery.ToSql()
 	if err != nil {
