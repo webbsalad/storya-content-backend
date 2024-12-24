@@ -3,7 +3,7 @@ package model
 type ContentType int
 
 const (
-	MOVIE ContentType = iota + 1
+	MOVIE ContentType = iota
 	GAME
 	BOOK
 )
