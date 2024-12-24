@@ -178,3 +178,72 @@ func (r *Repository) GetList(ctx context.Context, userID model.UserID, contentTy
 
 	return items, nil
 }
+
+func (r *Repository) GetRand(ctx context.Context, contentType model.ContentType, count int32) ([]model.Item, error) {
+	table := FromContentTypeToString(contentType)
+	var storedItems []Item
+	var items []model.Item
+
+	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+	randomQuery := psql.
+		Select("*").
+		From(table).
+		OrderBy("RANDOM()").
+		Limit(uint64(count))
+
+	q, args, err := randomQuery.ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("build random query: %w", err)
+	}
+
+	if err = r.db.SelectContext(ctx, &storedItems, q, args...); err != nil {
+		return nil, fmt.Errorf("get random items: %w", err)
+	}
+
+	for _, storedItem := range storedItems {
+		var tagIDs []string
+		var storedTags []Tag
+
+		tagsQuery := psql.
+			Select("tag_id").
+			From(fmt.Sprintf("%s_tags", table)).
+			Where(
+				sq.Eq{fmt.Sprintf("%s_id", table): storedItem.ID},
+			)
+
+		q, args, err = tagsQuery.ToSql()
+		if err != nil {
+			return nil, fmt.Errorf("build tags query: %w", err)
+		}
+
+		if err = r.db.SelectContext(ctx, &tagIDs, q, args...); err != nil {
+			return nil, fmt.Errorf("get tag IDs: %w", err)
+		}
+
+		tagsDetailsQuery := psql.
+			Select("id", "name").
+			From("tag").
+			Where(
+				sq.Eq{"id": tagIDs},
+			)
+
+		q, args, err = tagsDetailsQuery.ToSql()
+		if err != nil {
+			return nil, fmt.Errorf("build tags details query: %w", err)
+		}
+
+		if err = r.db.SelectContext(ctx, &storedTags, q, args...); err != nil {
+			return nil, fmt.Errorf("get tag details: %w", err)
+		}
+
+		item, err := toItemFromDB(storedItem, storedTags)
+		if err != nil {
+			return nil, fmt.Errorf("convert to model item: %w", err)
+		}
+
+		item.Type = contentType
+		items = append(items, item)
+	}
+
+	return items, nil
+}
