@@ -26,6 +26,7 @@ const (
 	ContentService_Create_FullMethodName  = "/content.ContentService/Create"
 	ContentService_Update_FullMethodName  = "/content.ContentService/Update"
 	ContentService_Delete_FullMethodName  = "/content.ContentService/Delete"
+	ContentService_Remove_FullMethodName  = "/content.ContentService/Remove"
 )
 
 // ContentServiceClient is the client API for ContentService service.
@@ -38,6 +39,7 @@ type ContentServiceClient interface {
 	Create(ctx context.Context, in *CreateItemRequest, opts ...grpc.CallOption) (*Item, error)
 	Update(ctx context.Context, in *UpdateItemRequest, opts ...grpc.CallOption) (*Item, error)
 	Delete(ctx context.Context, in *DeleteItemRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Remove(ctx context.Context, in *RemoveItemRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type contentServiceClient struct {
@@ -108,6 +110,16 @@ func (c *contentServiceClient) Delete(ctx context.Context, in *DeleteItemRequest
 	return out, nil
 }
 
+func (c *contentServiceClient) Remove(ctx context.Context, in *RemoveItemRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, ContentService_Remove_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ContentServiceServer is the server API for ContentService service.
 // All implementations must embed UnimplementedContentServiceServer
 // for forward compatibility.
@@ -118,6 +130,7 @@ type ContentServiceServer interface {
 	Create(context.Context, *CreateItemRequest) (*Item, error)
 	Update(context.Context, *UpdateItemRequest) (*Item, error)
 	Delete(context.Context, *DeleteItemRequest) (*emptypb.Empty, error)
+	Remove(context.Context, *RemoveItemRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedContentServiceServer()
 }
 
@@ -145,6 +158,9 @@ func (UnimplementedContentServiceServer) Update(context.Context, *UpdateItemRequ
 }
 func (UnimplementedContentServiceServer) Delete(context.Context, *DeleteItemRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedContentServiceServer) Remove(context.Context, *RemoveItemRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Remove not implemented")
 }
 func (UnimplementedContentServiceServer) mustEmbedUnimplementedContentServiceServer() {}
 func (UnimplementedContentServiceServer) testEmbeddedByValue()                        {}
@@ -275,6 +291,24 @@ func _ContentService_Delete_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ContentService_Remove_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveItemRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServiceServer).Remove(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ContentService_Remove_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServiceServer).Remove(ctx, req.(*RemoveItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ContentService_ServiceDesc is the grpc.ServiceDesc for ContentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -305,6 +339,10 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _ContentService_Delete_Handler,
+		},
+		{
+			MethodName: "Remove",
+			Handler:    _ContentService_Remove_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
