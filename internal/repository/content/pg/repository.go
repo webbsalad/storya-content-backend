@@ -247,3 +247,35 @@ func (r *Repository) GetRand(ctx context.Context, contentType model.ContentType,
 
 	return items, nil
 }
+
+func (r *Repository) Delete(ctx context.Context, itemID model.ItemID, contentType model.ContentType) error {
+	table := FromContentTypeToString(contentType)
+
+	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+	query := psql.
+		Delete(table).
+		Where(
+			sq.Eq{"id": itemID.String()},
+		)
+
+	q, args, err := query.ToSql()
+	if err != nil {
+		return fmt.Errorf("build query: %w", err)
+	}
+
+	res, err := r.db.ExecContext(ctx, q, args...)
+	if err != nil {
+		return fmt.Errorf("delete item: %w", err)
+	}
+
+	rowAffected, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("get affected rows: %w", err)
+	}
+
+	if rowAffected == 0 {
+		return model.ErrItemNotFound
+	}
+
+	return nil
+}

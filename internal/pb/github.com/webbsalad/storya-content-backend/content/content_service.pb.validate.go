@@ -800,7 +800,7 @@ func (m *UpdateItemRequest) validate(all bool) error {
 
 	// no validation rules for Year
 
-	// no validation rules for Type
+	// no validation rules for ContentType
 
 	if len(errors) > 0 {
 		return UpdateItemRequestMultiError(errors)
@@ -924,6 +924,8 @@ func (m *DeleteItemRequest) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
+	// no validation rules for ContentType
+
 	if len(errors) > 0 {
 		return DeleteItemRequestMultiError(errors)
 	}
@@ -1011,3 +1013,139 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DeleteItemRequestValidationError{}
+
+// Validate checks the field values on RemoveItemRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *RemoveItemRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RemoveItemRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RemoveItemRequestMultiError, or nil if none found.
+func (m *RemoveItemRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RemoveItemRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if err := m._validateUuid(m.GetItemId()); err != nil {
+		err = RemoveItemRequestValidationError{
+			field:  "ItemId",
+			reason: "value must be a valid UUID",
+			cause:  err,
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if err := m._validateUuid(m.GetUserId()); err != nil {
+		err = RemoveItemRequestValidationError{
+			field:  "UserId",
+			reason: "value must be a valid UUID",
+			cause:  err,
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	// no validation rules for ContentType
+
+	if len(errors) > 0 {
+		return RemoveItemRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+func (m *RemoveItemRequest) _validateUuid(uuid string) error {
+	if matched := _content_service_uuidPattern.MatchString(uuid); !matched {
+		return errors.New("invalid uuid format")
+	}
+
+	return nil
+}
+
+// RemoveItemRequestMultiError is an error wrapping multiple validation errors
+// returned by RemoveItemRequest.ValidateAll() if the designated constraints
+// aren't met.
+type RemoveItemRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RemoveItemRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RemoveItemRequestMultiError) AllErrors() []error { return m }
+
+// RemoveItemRequestValidationError is the validation error returned by
+// RemoveItemRequest.Validate if the designated constraints aren't met.
+type RemoveItemRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RemoveItemRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RemoveItemRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RemoveItemRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RemoveItemRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RemoveItemRequestValidationError) ErrorName() string {
+	return "RemoveItemRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RemoveItemRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRemoveItemRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RemoveItemRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RemoveItemRequestValidationError{}
