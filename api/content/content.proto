@@ -25,3 +25,9 @@ message Item {
     google.protobuf.Timestamp created_at = 5;
     repeated Tag tags = 6;
 }
+
+enum Value {
+    Like = 0;
+    Neutral = 1;
+    Dislike = 3;
+}

@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package content;
+
+import "api/content/content.proto";
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/webbsalad/storya-content-backend/content;content";
+
+service UserContentService {
+    rpc GetList(GetListRequest) returns (GetListResponse) {
+        option (google.api.http) = {
+            get: "/content/{content_type}/{user_id}"
+        };
+    };
+
+    rpc GetValued(GetValuedRequest) returns (GetValuedResponde) {
+        option (google.api.http) = {
+            get: "/content/{content_type}/{user_id}/{value}"
+        };
+    };
+
+    rpc Add(AddRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            patch: "/content/{content_type}",
+            body: "*"
+        };
+    };
+
+    rpc Remove(RemoveItemRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/content/{content_type}/{item_id}"
+        };
+    };
+}
+
+
+message GetListRequest {
+    string user_id = 1 [(validate.rules).string.uuid = true];
+    ContentType content_type = 2;
+}
+
+message GetListResponse {
+    repeated Item items = 1;
+}
+
+message GetValuedRequest {
+    string user_id = 1 [(validate.rules).string.uuid = true];
+    ContentType content_type = 2;
+    Value value = 3;
+}
+
+message GetValuedResponde {
+    string user_id = 1 [(validate.rules).string.uuid = true];
+    ContentType content_type = 2;
+    Value value = 3;
+}
+
+message AddRequest {
+    string item_id = 1 [(validate.rules).string.uuid = true];
+    ContentType content_type = 2;
+    Value value = 3;
+}
+
+message RemoveItemRequest {
+    string item_id = 1 [(validate.rules).string.uuid = true];
+    ContentType content_type = 2;
+
+}
