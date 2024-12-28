@@ -11,7 +11,7 @@ type Implementation struct {
 	ContentService service.Service
 }
 
-func NewImplementation(contentService service.Service) desc.ContentServiceServer {
+func NewContentImplementation(contentService service.Service) desc.ContentServiceServer {
 	return &Implementation{
 		ContentService: contentService,
 	}
