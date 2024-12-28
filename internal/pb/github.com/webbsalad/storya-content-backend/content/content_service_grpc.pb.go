@@ -21,12 +21,10 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	ContentService_Get_FullMethodName     = "/content.ContentService/Get"
-	ContentService_GetList_FullMethodName = "/content.ContentService/GetList"
 	ContentService_GetRand_FullMethodName = "/content.ContentService/GetRand"
 	ContentService_Create_FullMethodName  = "/content.ContentService/Create"
 	ContentService_Update_FullMethodName  = "/content.ContentService/Update"
 	ContentService_Delete_FullMethodName  = "/content.ContentService/Delete"
-	ContentService_Remove_FullMethodName  = "/content.ContentService/Remove"
 )
 
 // ContentServiceClient is the client API for ContentService service.
@@ -34,12 +32,10 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ContentServiceClient interface {
 	Get(ctx context.Context, in *GetItemRequest, opts ...grpc.CallOption) (*Item, error)
-	GetList(ctx context.Context, in *GetListRequest, opts ...grpc.CallOption) (*GetListResponse, error)
 	GetRand(ctx context.Context, in *GetRandRequest, opts ...grpc.CallOption) (*GetRandResponse, error)
 	Create(ctx context.Context, in *CreateItemRequest, opts ...grpc.CallOption) (*Item, error)
 	Update(ctx context.Context, in *UpdateItemRequest, opts ...grpc.CallOption) (*Item, error)
 	Delete(ctx context.Context, in *DeleteItemRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	Remove(ctx context.Context, in *RemoveItemRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type contentServiceClient struct {
@@ -54,16 +50,6 @@ func (c *contentServiceClient) Get(ctx context.Context, in *GetItemRequest, opts
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Item)
 	err := c.cc.Invoke(ctx, ContentService_Get_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *contentServiceClient) GetList(ctx context.Context, in *GetListRequest, opts ...grpc.CallOption) (*GetListResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetListResponse)
-	err := c.cc.Invoke(ctx, ContentService_GetList_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -110,27 +96,15 @@ func (c *contentServiceClient) Delete(ctx context.Context, in *DeleteItemRequest
 	return out, nil
 }
 
-func (c *contentServiceClient) Remove(ctx context.Context, in *RemoveItemRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, ContentService_Remove_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // ContentServiceServer is the server API for ContentService service.
 // All implementations must embed UnimplementedContentServiceServer
 // for forward compatibility.
 type ContentServiceServer interface {
 	Get(context.Context, *GetItemRequest) (*Item, error)
-	GetList(context.Context, *GetListRequest) (*GetListResponse, error)
 	GetRand(context.Context, *GetRandRequest) (*GetRandResponse, error)
 	Create(context.Context, *CreateItemRequest) (*Item, error)
 	Update(context.Context, *UpdateItemRequest) (*Item, error)
 	Delete(context.Context, *DeleteItemRequest) (*emptypb.Empty, error)
-	Remove(context.Context, *RemoveItemRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedContentServiceServer()
 }
 
@@ -144,9 +118,6 @@ type UnimplementedContentServiceServer struct{}
 func (UnimplementedContentServiceServer) Get(context.Context, *GetItemRequest) (*Item, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
-func (UnimplementedContentServiceServer) GetList(context.Context, *GetListRequest) (*GetListResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetList not implemented")
-}
 func (UnimplementedContentServiceServer) GetRand(context.Context, *GetRandRequest) (*GetRandResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRand not implemented")
 }
@@ -158,9 +129,6 @@ func (UnimplementedContentServiceServer) Update(context.Context, *UpdateItemRequ
 }
 func (UnimplementedContentServiceServer) Delete(context.Context, *DeleteItemRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
-}
-func (UnimplementedContentServiceServer) Remove(context.Context, *RemoveItemRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Remove not implemented")
 }
 func (UnimplementedContentServiceServer) mustEmbedUnimplementedContentServiceServer() {}
 func (UnimplementedContentServiceServer) testEmbeddedByValue()                        {}
@@ -197,24 +165,6 @@ func _ContentService_Get_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContentServiceServer).Get(ctx, req.(*GetItemRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ContentService_GetList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetListRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ContentServiceServer).GetList(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ContentService_GetList_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServiceServer).GetList(ctx, req.(*GetListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -291,24 +241,6 @@ func _ContentService_Delete_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ContentService_Remove_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RemoveItemRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ContentServiceServer).Remove(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ContentService_Remove_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServiceServer).Remove(ctx, req.(*RemoveItemRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // ContentService_ServiceDesc is the grpc.ServiceDesc for ContentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -319,10 +251,6 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Get",
 			Handler:    _ContentService_Get_Handler,
-		},
-		{
-			MethodName: "GetList",
-			Handler:    _ContentService_GetList_Handler,
 		},
 		{
 			MethodName: "GetRand",
@@ -339,10 +267,6 @@ var ContentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _ContentService_Delete_Handler,
-		},
-		{
-			MethodName: "Remove",
-			Handler:    _ContentService_Remove_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
