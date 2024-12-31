@@ -345,6 +345,10 @@ func (r *Repository) Create(ctx context.Context, item model.Item, contentType mo
 		return model.Item{}, fmt.Errorf("convert str to item id: %w", err)
 	}
 
+	if err = tx.Commit(); err != nil {
+		return model.Item{}, fmt.Errorf("commit transaction: %w", err)
+	}
+
 	return item, nil
 }
 
