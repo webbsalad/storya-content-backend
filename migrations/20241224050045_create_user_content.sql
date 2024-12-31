@@ -4,7 +4,7 @@ CREATE TABLE user_content (
     id UUID DEFAULT uuid_generate_v4() NOT NULL PRIMARY KEY,
     user_id UUID NOT NULL,
     content_id UUID NOT NULL,
-    content_type TEXT CHECK (content_type IN ('game', 'book', 'movie')) NOT NULL,
+    content_type INT CHECK (content_type >= 0 AND content_type <= 3) NOT NULL,
     rating INT CHECK (rating >= 0 AND rating <= 3),
     created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
 
