@@ -279,3 +279,39 @@ func (r *Repository) Delete(ctx context.Context, itemID model.ItemID, contentTyp
 
 	return nil
 }
+
+func (r *Repository) Remove(ctx context.Context, userID model.UserID, itemID model.ItemID, contentType model.ContentType) error {
+
+	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+	query := psql.
+		Delete("user_content").
+		Where(
+			sq.And{
+				sq.Eq{"content_id": itemID.String()},
+				sq.Eq{"user_id": userID.String()},
+				sq.Eq{"content_type": contentType},
+			},
+		)
+
+	q, args, err := query.ToSql()
+	if err != nil {
+		return fmt.Errorf("build query: %w", err)
+	}
+
+	res, err := r.db.ExecContext(ctx, q, args...)
+	if err != nil {
+		return fmt.Errorf("remove item: %w", err)
+	}
+
+	rowAffected, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("get affected rows: %w", err)
+	}
+
+	if rowAffected == 0 {
+		return model.ErrItemNotFound
+	}
+
+	return nil
+
+}
