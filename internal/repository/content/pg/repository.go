@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
@@ -246,6 +247,109 @@ func (r *Repository) GetRand(ctx context.Context, contentType model.ContentType,
 	}
 
 	return items, nil
+}
+
+func (r *Repository) Create(ctx context.Context, item model.Item, contentType model.ContentType) (model.Item, error) {
+	table := FromContentTypeToString(contentType)
+
+	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+
+	tx, err := r.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return model.Item{}, fmt.Errorf("begin transaction: %w", err)
+	}
+
+	defer func() {
+		rollbackErr := tx.Rollback()
+		if err == nil && rollbackErr != nil {
+			err = fmt.Errorf("rollback: %w", rollbackErr)
+		}
+	}()
+
+	var tagIDs []string
+	for _, tag := range item.Tags {
+		var tagID string
+
+		tagQuery := psql.
+			Select("id").
+			From("tag").
+			Where(sq.Eq{"name": tag.Name})
+
+		q, args, err := tagQuery.ToSql()
+		if err != nil {
+			return model.Item{}, fmt.Errorf("build tag query: %w", err)
+		}
+
+		err = tx.GetContext(ctx, &tagID, q, args...)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				insertTagQuery := psql.
+					Insert("tag").
+					Columns("name").
+					Values(tag.Name).
+					Suffix("RETURNING id")
+
+				q, args, err = insertTagQuery.ToSql()
+				if err != nil {
+					return model.Item{}, fmt.Errorf("build insert tag query: %w", err)
+				}
+
+				err = tx.GetContext(ctx, &tagID, q, args...)
+				if err != nil {
+					return model.Item{}, fmt.Errorf("insert tag: %w", err)
+				}
+			} else {
+				return model.Item{}, fmt.Errorf("get tag: %w", err)
+			}
+		}
+
+		tagIDs = append(tagIDs, tagID)
+	}
+
+	insertItemQuery := psql.
+		Insert(table).
+		Columns("title", "year", "created_at").
+		Values(item.Title, item.Year, time.Now()).
+		Suffix("RETURNING id")
+
+	q, args, err := insertItemQuery.ToSql()
+	if err != nil {
+		return model.Item{}, fmt.Errorf("build insert item query: %w", err)
+	}
+
+	var itemID string
+	err = tx.GetContext(ctx, &itemID, q, args...)
+	if err != nil {
+		return model.Item{}, fmt.Errorf("insert item: %w", err)
+	}
+
+	for _, tagID := range tagIDs {
+		insertTagLinkQuery := psql.
+			Insert(fmt.Sprintf("%s_tags", table)).
+			Columns(fmt.Sprintf("%s_id", table), "tag_id").
+			Values(itemID, tagID)
+
+		q, args, err := insertTagLinkQuery.ToSql()
+		if err != nil {
+			return model.Item{}, fmt.Errorf("build insert tag link query: %w", err)
+		}
+
+		_, err = tx.ExecContext(ctx, q, args...)
+		if err != nil {
+			return model.Item{}, fmt.Errorf("insert tag link: %w", err)
+		}
+	}
+
+	item.ID, err = model.ItemIDFromString(itemID)
+	if err != nil {
+		return model.Item{}, fmt.Errorf("convert str to item id: %w", err)
+	}
+
+	if err = tx.Commit(); err != nil {
+		return model.Item{}, fmt.Errorf("commit transaction: %w", err)
+	}
+
+	return item, nil
 }
 
 func (r *Repository) Delete(ctx context.Context, itemID model.ItemID, contentType model.ContentType) error {

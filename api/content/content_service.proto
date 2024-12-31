@@ -64,7 +64,7 @@ message CreateItemRequest {
     string title = 1;
     int32 year = 2;
     ContentType type = 3;
-    repeated string tag_ids = 4;
+    repeated Tag tags = 4;
 }
 
 message UpdateItemRequest {
