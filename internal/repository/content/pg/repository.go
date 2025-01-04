@@ -100,7 +100,7 @@ func (r *Repository) GetList(ctx context.Context, userID model.UserID, contentTy
 		Select("content_id").
 		From("user_content").
 		Where(
-			sq.Eq{"user_id": userID.String(), "content_type": table},
+			sq.Eq{"user_id": userID.String(), "content_type": contentType},
 		)
 
 	q, args, err := contentQuery.ToSql()
