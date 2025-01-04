@@ -5,7 +5,7 @@ CREATE TABLE user_content (
     user_id UUID NOT NULL,
     content_id UUID NOT NULL,
     content_type INT CHECK (content_type >= 0 AND content_type <= 3) NOT NULL,
-    rating INT CHECK (rating >= 0 AND rating <= 3),
+    value INT CHECK (value >= 0 AND value <= 3),
     created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
 
     CONSTRAINT fk_user_content_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE

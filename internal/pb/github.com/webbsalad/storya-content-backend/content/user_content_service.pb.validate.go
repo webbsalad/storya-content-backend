@@ -418,66 +418,76 @@ var _ interface {
 	ErrorName() string
 } = GetValuedRequestValidationError{}
 
-// Validate checks the field values on GetValuedResponde with the rules defined
+// Validate checks the field values on GetValuedResponse with the rules defined
 // in the proto definition for this message. If any rules are violated, the
 // first error encountered is returned, or nil if there are no violations.
-func (m *GetValuedResponde) Validate() error {
+func (m *GetValuedResponse) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on GetValuedResponde with the rules
+// ValidateAll checks the field values on GetValuedResponse with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// GetValuedRespondeMultiError, or nil if none found.
-func (m *GetValuedResponde) ValidateAll() error {
+// GetValuedResponseMultiError, or nil if none found.
+func (m *GetValuedResponse) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *GetValuedResponde) validate(all bool) error {
+func (m *GetValuedResponse) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	if err := m._validateUuid(m.GetUserId()); err != nil {
-		err = GetValuedRespondeValidationError{
-			field:  "UserId",
-			reason: "value must be a valid UUID",
-			cause:  err,
+	for idx, item := range m.GetItems() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetValuedResponseValidationError{
+						field:  fmt.Sprintf("Items[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetValuedResponseValidationError{
+						field:  fmt.Sprintf("Items[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetValuedResponseValidationError{
+					field:  fmt.Sprintf("Items[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
 		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
+
 	}
-
-	// no validation rules for ContentType
-
-	// no validation rules for Value
 
 	if len(errors) > 0 {
-		return GetValuedRespondeMultiError(errors)
+		return GetValuedResponseMultiError(errors)
 	}
 
 	return nil
 }
 
-func (m *GetValuedResponde) _validateUuid(uuid string) error {
-	if matched := _user_content_service_uuidPattern.MatchString(uuid); !matched {
-		return errors.New("invalid uuid format")
-	}
-
-	return nil
-}
-
-// GetValuedRespondeMultiError is an error wrapping multiple validation errors
-// returned by GetValuedResponde.ValidateAll() if the designated constraints
+// GetValuedResponseMultiError is an error wrapping multiple validation errors
+// returned by GetValuedResponse.ValidateAll() if the designated constraints
 // aren't met.
-type GetValuedRespondeMultiError []error
+type GetValuedResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m GetValuedRespondeMultiError) Error() string {
+func (m GetValuedResponseMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -486,11 +496,11 @@ func (m GetValuedRespondeMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m GetValuedRespondeMultiError) AllErrors() []error { return m }
+func (m GetValuedResponseMultiError) AllErrors() []error { return m }
 
-// GetValuedRespondeValidationError is the validation error returned by
-// GetValuedResponde.Validate if the designated constraints aren't met.
-type GetValuedRespondeValidationError struct {
+// GetValuedResponseValidationError is the validation error returned by
+// GetValuedResponse.Validate if the designated constraints aren't met.
+type GetValuedResponseValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -498,24 +508,24 @@ type GetValuedRespondeValidationError struct {
 }
 
 // Field function returns field value.
-func (e GetValuedRespondeValidationError) Field() string { return e.field }
+func (e GetValuedResponseValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e GetValuedRespondeValidationError) Reason() string { return e.reason }
+func (e GetValuedResponseValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e GetValuedRespondeValidationError) Cause() error { return e.cause }
+func (e GetValuedResponseValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e GetValuedRespondeValidationError) Key() bool { return e.key }
+func (e GetValuedResponseValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e GetValuedRespondeValidationError) ErrorName() string {
-	return "GetValuedRespondeValidationError"
+func (e GetValuedResponseValidationError) ErrorName() string {
+	return "GetValuedResponseValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e GetValuedRespondeValidationError) Error() string {
+func (e GetValuedResponseValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -527,14 +537,14 @@ func (e GetValuedRespondeValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sGetValuedResponde.%s: %s%s",
+		"invalid %sGetValuedResponse.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = GetValuedRespondeValidationError{}
+var _ error = GetValuedResponseValidationError{}
 
 var _ interface {
 	Field() string
@@ -542,7 +552,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = GetValuedRespondeValidationError{}
+} = GetValuedResponseValidationError{}
 
 // Validate checks the field values on AddRequest with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
