@@ -31,7 +31,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserContentServiceClient interface {
 	GetList(ctx context.Context, in *GetListRequest, opts ...grpc.CallOption) (*GetListResponse, error)
-	GetValued(ctx context.Context, in *GetValuedRequest, opts ...grpc.CallOption) (*GetValuedResponde, error)
+	GetValued(ctx context.Context, in *GetValuedRequest, opts ...grpc.CallOption) (*GetValuedResponse, error)
 	Add(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Remove(ctx context.Context, in *RemoveItemRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
@@ -54,9 +54,9 @@ func (c *userContentServiceClient) GetList(ctx context.Context, in *GetListReque
 	return out, nil
 }
 
-func (c *userContentServiceClient) GetValued(ctx context.Context, in *GetValuedRequest, opts ...grpc.CallOption) (*GetValuedResponde, error) {
+func (c *userContentServiceClient) GetValued(ctx context.Context, in *GetValuedRequest, opts ...grpc.CallOption) (*GetValuedResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetValuedResponde)
+	out := new(GetValuedResponse)
 	err := c.cc.Invoke(ctx, UserContentService_GetValued_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -89,7 +89,7 @@ func (c *userContentServiceClient) Remove(ctx context.Context, in *RemoveItemReq
 // for forward compatibility.
 type UserContentServiceServer interface {
 	GetList(context.Context, *GetListRequest) (*GetListResponse, error)
-	GetValued(context.Context, *GetValuedRequest) (*GetValuedResponde, error)
+	GetValued(context.Context, *GetValuedRequest) (*GetValuedResponse, error)
 	Add(context.Context, *AddRequest) (*emptypb.Empty, error)
 	Remove(context.Context, *RemoveItemRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedUserContentServiceServer()
@@ -105,7 +105,7 @@ type UnimplementedUserContentServiceServer struct{}
 func (UnimplementedUserContentServiceServer) GetList(context.Context, *GetListRequest) (*GetListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetList not implemented")
 }
-func (UnimplementedUserContentServiceServer) GetValued(context.Context, *GetValuedRequest) (*GetValuedResponde, error) {
+func (UnimplementedUserContentServiceServer) GetValued(context.Context, *GetValuedRequest) (*GetValuedResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetValued not implemented")
 }
 func (UnimplementedUserContentServiceServer) Add(context.Context, *AddRequest) (*emptypb.Empty, error) {

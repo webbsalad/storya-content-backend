@@ -16,7 +16,7 @@ service UserContentService {
         };
     };
 
-    rpc GetValued(GetValuedRequest) returns (GetValuedResponde) {
+    rpc GetValued(GetValuedRequest) returns (GetValuedResponse) {
         option (google.api.http) = {
             get: "/content/{content_type}/{user_id}/{value}"
         };
@@ -52,10 +52,8 @@ message GetValuedRequest {
     Value value = 3;
 }
 
-message GetValuedResponde {
-    string user_id = 1 [(validate.rules).string.uuid = true];
-    ContentType content_type = 2;
-    Value value = 3;
+message GetValuedResponse {
+    repeated Item items = 1;
 }
 
 message AddRequest {

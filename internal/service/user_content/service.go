@@ -8,5 +8,6 @@ import (
 
 type Service interface {
 	GetList(ctx context.Context, userID model.UserID, contentType model.ContentType) ([]model.Item, error)
+	GetValued(ctx context.Context, userID model.UserID, contentType model.ContentType, value model.Value) ([]model.Item, error)
 	Remove(ctx context.Context, userID model.UserID, itemID model.ItemID, contentType model.ContentType) error
 }
