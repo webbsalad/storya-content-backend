@@ -41,3 +41,18 @@ func ToItemFromDesc(in *content.Item) (model.Item, error) {
 		Tags:  ToTagsFromDesc(in.Tags),
 	}, nil
 }
+
+func UpdateItemRequetToDesc(in *content.UpdateItemRequest) (model.Item, error) {
+	itemID, err := model.ItemIDFromString(in.GetItemId())
+	if err != nil {
+		return model.Item{}, fmt.Errorf("convert str to item id: %w", err)
+	}
+
+	return model.Item{
+		ID:    itemID,
+		Title: in.GetTitle(),
+		Year:  in.GetYear(),
+		Type:  model.ContentType(in.Type),
+		Tags:  ToTagsFromDesc(in.Tags),
+	}, nil
+}

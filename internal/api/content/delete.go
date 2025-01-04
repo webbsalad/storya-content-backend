@@ -21,7 +21,7 @@ func (i *Implementation) Delete(ctx context.Context, req *content.DeleteItemRequ
 		return nil, status.Errorf(codes.InvalidArgument, "invalid argument: %v", err)
 	}
 
-	if err := i.ContentService.Delete(ctx, itemID, model.ContentType(req.ContentType)); err != nil {
+	if err := i.ContentService.Delete(ctx, itemID, model.ContentType(req.Type)); err != nil {
 		return nil, convertor.ConvertError(err)
 	}
 

@@ -32,14 +32,14 @@ service ContentService {
   
     rpc Update(UpdateItemRequest) returns (Item) {
         option (google.api.http) = {
-            patch: "/items/{item_id}",
+            patch: "/items/{type}/{item_id}",
             body: "*"
         };
     };
   
     rpc Delete(DeleteItemRequest) returns (google.protobuf.Empty) { 
         option (google.api.http) = {
-            delete: "/items/{content_type}/{item_id}"
+            delete: "/items/{type}/{item_id}"
         };
     };
 
@@ -71,11 +71,11 @@ message UpdateItemRequest {
     string item_id = 1 [(validate.rules).string.uuid = true];
     string title = 2;
     int32 year = 3;
-    ContentType content_type = 4;
-    repeated string tag_ids = 5;
+    ContentType type = 4;
+    repeated Tag tags = 5;
 }
 
 message DeleteItemRequest {
     string item_id = 1 [(validate.rules).string.uuid = true];
-    ContentType content_type = 2;
+    ContentType type = 2;
 }

@@ -223,10 +223,23 @@ func request_ContentService_Update_0(ctx context.Context, marshaler runtime.Mars
 
 	var (
 		val string
+		e   int32
 		ok  bool
 		err error
 		_   = err
 	)
+
+	val, ok = pathParams["type"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "type")
+	}
+
+	e, err = runtime.Enum(val, ContentType_value)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "type", err)
+	}
+
+	protoReq.Type = ContentType(e)
 
 	val, ok = pathParams["item_id"]
 	if !ok {
@@ -253,10 +266,23 @@ func local_request_ContentService_Update_0(ctx context.Context, marshaler runtim
 
 	var (
 		val string
+		e   int32
 		ok  bool
 		err error
 		_   = err
 	)
+
+	val, ok = pathParams["type"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "type")
+	}
+
+	e, err = runtime.Enum(val, ContentType_value)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "type", err)
+	}
+
+	protoReq.Type = ContentType(e)
 
 	val, ok = pathParams["item_id"]
 	if !ok {
@@ -285,17 +311,17 @@ func request_ContentService_Delete_0(ctx context.Context, marshaler runtime.Mars
 		_   = err
 	)
 
-	val, ok = pathParams["content_type"]
+	val, ok = pathParams["type"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "content_type")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "type")
 	}
 
 	e, err = runtime.Enum(val, ContentType_value)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "content_type", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "type", err)
 	}
 
-	protoReq.ContentType = ContentType(e)
+	protoReq.Type = ContentType(e)
 
 	val, ok = pathParams["item_id"]
 	if !ok {
@@ -324,17 +350,17 @@ func local_request_ContentService_Delete_0(ctx context.Context, marshaler runtim
 		_   = err
 	)
 
-	val, ok = pathParams["content_type"]
+	val, ok = pathParams["type"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "content_type")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "type")
 	}
 
 	e, err = runtime.Enum(val, ContentType_value)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "content_type", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "type", err)
 	}
 
-	protoReq.ContentType = ContentType(e)
+	protoReq.Type = ContentType(e)
 
 	val, ok = pathParams["item_id"]
 	if !ok {
@@ -441,7 +467,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/content.ContentService/Update", runtime.WithHTTPPathPattern("/items/{item_id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/content.ContentService/Update", runtime.WithHTTPPathPattern("/items/{type}/{item_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -466,7 +492,7 @@ func RegisterContentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/content.ContentService/Delete", runtime.WithHTTPPathPattern("/items/{content_type}/{item_id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/content.ContentService/Delete", runtime.WithHTTPPathPattern("/items/{type}/{item_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -596,7 +622,7 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/content.ContentService/Update", runtime.WithHTTPPathPattern("/items/{item_id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/content.ContentService/Update", runtime.WithHTTPPathPattern("/items/{type}/{item_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -618,7 +644,7 @@ func RegisterContentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/content.ContentService/Delete", runtime.WithHTTPPathPattern("/items/{content_type}/{item_id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/content.ContentService/Delete", runtime.WithHTTPPathPattern("/items/{type}/{item_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -644,9 +670,9 @@ var (
 
 	pattern_ContentService_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"items"}, ""))
 
-	pattern_ContentService_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"items", "item_id"}, ""))
+	pattern_ContentService_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2}, []string{"items", "type", "item_id"}, ""))
 
-	pattern_ContentService_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2}, []string{"items", "content_type", "item_id"}, ""))
+	pattern_ContentService_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2}, []string{"items", "type", "item_id"}, ""))
 )
 
 var (

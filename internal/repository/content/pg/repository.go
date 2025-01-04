@@ -352,6 +352,116 @@ func (r *Repository) Create(ctx context.Context, item model.Item, contentType mo
 	return item, nil
 }
 
+func (r *Repository) Update(ctx context.Context, item model.Item, contentType model.ContentType) (model.Item, error) {
+	table := FromContentTypeToString(contentType)
+
+	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+
+	tx, err := r.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return model.Item{}, fmt.Errorf("begin transaction: %w", err)
+	}
+
+	defer func() {
+		rollbackErr := tx.Rollback()
+		if err == nil && rollbackErr != nil {
+			err = fmt.Errorf("rollback: %w", rollbackErr)
+		}
+	}()
+
+	updateItemQuery := psql.
+		Update(table).
+		Set("title", item.Title).
+		Set("year", item.Year).
+		Where(sq.Eq{"id": item.ID.String()})
+
+	q, args, err := updateItemQuery.ToSql()
+	if err != nil {
+		return model.Item{}, fmt.Errorf("build update item query: %w", err)
+	}
+
+	_, err = tx.ExecContext(ctx, q, args...)
+	if err != nil {
+		return model.Item{}, fmt.Errorf("update item: %w", err)
+	}
+
+	deleteTagLinksQuery := psql.
+		Delete(fmt.Sprintf("%s_tags", table)).
+		Where(sq.Eq{fmt.Sprintf("%s_id", table): item.ID.String()})
+
+	q, args, err = deleteTagLinksQuery.ToSql()
+	if err != nil {
+		return model.Item{}, fmt.Errorf("build delete tag links query: %w", err)
+	}
+
+	_, err = tx.ExecContext(ctx, q, args...)
+	if err != nil {
+		return model.Item{}, fmt.Errorf("delete tag links: %w", err)
+	}
+
+	var tagIDs []string
+	for _, tag := range item.Tags {
+		var tagID string
+		tagQuery := psql.
+			Select("id").
+			From("tag").
+			Where(sq.Eq{"name": tag.Name})
+
+		q, args, err := tagQuery.ToSql()
+		if err != nil {
+			return model.Item{}, fmt.Errorf("build tag query: %w", err)
+		}
+
+		err = tx.GetContext(ctx, &tagID, q, args...)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				insertTagQuery := psql.
+					Insert("tag").
+					Columns("name").
+					Values(tag.Name).
+					Suffix("RETURNING id")
+
+				q, args, err = insertTagQuery.ToSql()
+				if err != nil {
+					return model.Item{}, fmt.Errorf("build insert tag query: %w", err)
+				}
+
+				err = tx.GetContext(ctx, &tagID, q, args...)
+				if err != nil {
+					return model.Item{}, fmt.Errorf("insert tag: %w", err)
+				}
+			} else {
+				return model.Item{}, fmt.Errorf("get tag: %w", err)
+			}
+		}
+
+		tagIDs = append(tagIDs, tagID)
+	}
+
+	for _, tagID := range tagIDs {
+		insertTagLinkQuery := psql.
+			Insert(fmt.Sprintf("%s_tags", table)).
+			Columns(fmt.Sprintf("%s_id", table), "tag_id").
+			Values(item.ID.String(), tagID)
+
+		q, args, err := insertTagLinkQuery.ToSql()
+		if err != nil {
+			return model.Item{}, fmt.Errorf("build insert tag link query: %w", err)
+		}
+
+		_, err = tx.ExecContext(ctx, q, args...)
+		if err != nil {
+			return model.Item{}, fmt.Errorf("insert tag link: %w", err)
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		return model.Item{}, fmt.Errorf("commit transaction: %w", err)
+	}
+
+	return item, nil
+}
+
 func (r *Repository) Delete(ctx context.Context, itemID model.ItemID, contentType model.ContentType) error {
 	table := FromContentTypeToString(contentType)
 
