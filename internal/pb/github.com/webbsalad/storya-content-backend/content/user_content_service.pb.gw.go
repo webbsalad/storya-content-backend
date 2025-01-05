@@ -31,8 +31,8 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
-func request_UserContentService_GetList_0(ctx context.Context, marshaler runtime.Marshaler, client UserContentServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetListRequest
+func request_UserContentService_GetUserItems_0(ctx context.Context, marshaler runtime.Marshaler, client UserContentServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetUserItemsRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -65,13 +65,13 @@ func request_UserContentService_GetList_0(ctx context.Context, marshaler runtime
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_id", err)
 	}
 
-	msg, err := client.GetList(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.GetUserItems(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_UserContentService_GetList_0(ctx context.Context, marshaler runtime.Marshaler, server UserContentServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetListRequest
+func local_request_UserContentService_GetUserItems_0(ctx context.Context, marshaler runtime.Marshaler, server UserContentServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetUserItemsRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -104,7 +104,7 @@ func local_request_UserContentService_GetList_0(ctx context.Context, marshaler r
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_id", err)
 	}
 
-	msg, err := server.GetList(ctx, &protoReq)
+	msg, err := server.GetUserItems(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -362,7 +362,7 @@ func local_request_UserContentService_Remove_0(ctx context.Context, marshaler ru
 // GRPC interceptors will not work for this type of registration. To use interceptors, you must use the "runtime.WithMiddlewares" option in the "runtime.NewServeMux" call.
 func RegisterUserContentServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server UserContentServiceServer) error {
 
-	mux.Handle("GET", pattern_UserContentService_GetList_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_UserContentService_GetUserItems_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -370,12 +370,12 @@ func RegisterUserContentServiceHandlerServer(ctx context.Context, mux *runtime.S
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/content.UserContentService/GetList", runtime.WithHTTPPathPattern("/content/{content_type}/{user_id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/content.UserContentService/GetUserItems", runtime.WithHTTPPathPattern("/content/{content_type}/{user_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_UserContentService_GetList_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_UserContentService_GetUserItems_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -383,7 +383,7 @@ func RegisterUserContentServiceHandlerServer(ctx context.Context, mux *runtime.S
 			return
 		}
 
-		forward_UserContentService_GetList_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_UserContentService_GetUserItems_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -503,25 +503,25 @@ func RegisterUserContentServiceHandler(ctx context.Context, mux *runtime.ServeMu
 // "UserContentServiceClient" to call the correct interceptors. This client ignores the HTTP middlewares.
 func RegisterUserContentServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client UserContentServiceClient) error {
 
-	mux.Handle("GET", pattern_UserContentService_GetList_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_UserContentService_GetUserItems_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/content.UserContentService/GetList", runtime.WithHTTPPathPattern("/content/{content_type}/{user_id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/content.UserContentService/GetUserItems", runtime.WithHTTPPathPattern("/content/{content_type}/{user_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_UserContentService_GetList_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_UserContentService_GetUserItems_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_UserContentService_GetList_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_UserContentService_GetUserItems_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -595,7 +595,7 @@ func RegisterUserContentServiceHandlerClient(ctx context.Context, mux *runtime.S
 }
 
 var (
-	pattern_UserContentService_GetList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2}, []string{"content", "content_type", "user_id"}, ""))
+	pattern_UserContentService_GetUserItems_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2}, []string{"content", "content_type", "user_id"}, ""))
 
 	pattern_UserContentService_GetValued_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"content", "content_type", "user_id", "value"}, ""))
 
@@ -605,7 +605,7 @@ var (
 )
 
 var (
-	forward_UserContentService_GetList_0 = runtime.ForwardResponseMessage
+	forward_UserContentService_GetUserItems_0 = runtime.ForwardResponseMessage
 
 	forward_UserContentService_GetValued_0 = runtime.ForwardResponseMessage
 

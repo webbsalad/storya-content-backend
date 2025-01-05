@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (i *Implementation) GetList(ctx context.Context, req *content.GetListRequest) (*content.GetListResponse, error) {
+func (i *Implementation) GetUserItems(ctx context.Context, req *content.GetUserItemsRequest) (*content.GetUserItemsResponse, error) {
 	if err := req.Validate(); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid request: %v", err)
 	}
@@ -20,12 +20,12 @@ func (i *Implementation) GetList(ctx context.Context, req *content.GetListReques
 		return nil, status.Errorf(codes.InvalidArgument, "invalid user id: %v", err)
 	}
 
-	userItems, err := i.UserContentService.GetList(ctx, userID, model.ContentType(req.GetContentType()))
+	userItems, err := i.UserContentService.GetUserItems(ctx, userID, model.ContentType(req.GetContentType()))
 	if err != nil {
 		return nil, convertor.ConvertError(err)
 	}
 
-	return &content.GetListResponse{
+	return &content.GetUserItemsResponse{
 		UserItems: convertor.ToDescFromUserItems(userItems),
 	}, nil
 
