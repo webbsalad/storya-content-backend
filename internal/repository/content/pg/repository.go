@@ -90,7 +90,7 @@ func (r *Repository) Get(ctx context.Context, itemID model.ItemID, contentType m
 	return item, nil
 }
 
-func (r *Repository) GetList(ctx context.Context, userID model.UserID, contentType model.ContentType) ([]model.UserItem, error) {
+func (r *Repository) GetUserItems(ctx context.Context, userID model.UserID, contentType model.ContentType) ([]model.UserItem, error) {
 	table := FromContentTypeToString(contentType)
 	var userContent []UserItem
 	var userItems []model.UserItem

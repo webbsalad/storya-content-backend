@@ -20,17 +20,17 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserContentService_GetList_FullMethodName   = "/content.UserContentService/GetList"
-	UserContentService_GetValued_FullMethodName = "/content.UserContentService/GetValued"
-	UserContentService_Add_FullMethodName       = "/content.UserContentService/Add"
-	UserContentService_Remove_FullMethodName    = "/content.UserContentService/Remove"
+	UserContentService_GetUserItems_FullMethodName = "/content.UserContentService/GetUserItems"
+	UserContentService_GetValued_FullMethodName    = "/content.UserContentService/GetValued"
+	UserContentService_Add_FullMethodName          = "/content.UserContentService/Add"
+	UserContentService_Remove_FullMethodName       = "/content.UserContentService/Remove"
 )
 
 // UserContentServiceClient is the client API for UserContentService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserContentServiceClient interface {
-	GetList(ctx context.Context, in *GetListRequest, opts ...grpc.CallOption) (*GetListResponse, error)
+	GetUserItems(ctx context.Context, in *GetUserItemsRequest, opts ...grpc.CallOption) (*GetUserItemsResponse, error)
 	GetValued(ctx context.Context, in *GetValuedRequest, opts ...grpc.CallOption) (*GetValuedResponse, error)
 	Add(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Remove(ctx context.Context, in *RemoveItemRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -44,10 +44,10 @@ func NewUserContentServiceClient(cc grpc.ClientConnInterface) UserContentService
 	return &userContentServiceClient{cc}
 }
 
-func (c *userContentServiceClient) GetList(ctx context.Context, in *GetListRequest, opts ...grpc.CallOption) (*GetListResponse, error) {
+func (c *userContentServiceClient) GetUserItems(ctx context.Context, in *GetUserItemsRequest, opts ...grpc.CallOption) (*GetUserItemsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetListResponse)
-	err := c.cc.Invoke(ctx, UserContentService_GetList_FullMethodName, in, out, cOpts...)
+	out := new(GetUserItemsResponse)
+	err := c.cc.Invoke(ctx, UserContentService_GetUserItems_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (c *userContentServiceClient) Remove(ctx context.Context, in *RemoveItemReq
 // All implementations must embed UnimplementedUserContentServiceServer
 // for forward compatibility.
 type UserContentServiceServer interface {
-	GetList(context.Context, *GetListRequest) (*GetListResponse, error)
+	GetUserItems(context.Context, *GetUserItemsRequest) (*GetUserItemsResponse, error)
 	GetValued(context.Context, *GetValuedRequest) (*GetValuedResponse, error)
 	Add(context.Context, *AddRequest) (*emptypb.Empty, error)
 	Remove(context.Context, *RemoveItemRequest) (*emptypb.Empty, error)
@@ -102,8 +102,8 @@ type UserContentServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedUserContentServiceServer struct{}
 
-func (UnimplementedUserContentServiceServer) GetList(context.Context, *GetListRequest) (*GetListResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetList not implemented")
+func (UnimplementedUserContentServiceServer) GetUserItems(context.Context, *GetUserItemsRequest) (*GetUserItemsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserItems not implemented")
 }
 func (UnimplementedUserContentServiceServer) GetValued(context.Context, *GetValuedRequest) (*GetValuedResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetValued not implemented")
@@ -135,20 +135,20 @@ func RegisterUserContentServiceServer(s grpc.ServiceRegistrar, srv UserContentSe
 	s.RegisterService(&UserContentService_ServiceDesc, srv)
 }
 
-func _UserContentService_GetList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetListRequest)
+func _UserContentService_GetUserItems_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserItemsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserContentServiceServer).GetList(ctx, in)
+		return srv.(UserContentServiceServer).GetUserItems(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserContentService_GetList_FullMethodName,
+		FullMethod: UserContentService_GetUserItems_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserContentServiceServer).GetList(ctx, req.(*GetListRequest))
+		return srv.(UserContentServiceServer).GetUserItems(ctx, req.(*GetUserItemsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -215,8 +215,8 @@ var UserContentService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*UserContentServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetList",
-			Handler:    _UserContentService_GetList_Handler,
+			MethodName: "GetUserItems",
+			Handler:    _UserContentService_GetUserItems_Handler,
 		},
 		{
 			MethodName: "GetValued",
