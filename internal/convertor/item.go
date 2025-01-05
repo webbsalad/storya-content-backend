@@ -42,7 +42,22 @@ func ToItemFromDesc(in *content.Item) (model.Item, error) {
 	}, nil
 }
 
-func UpdateItemRequetToDesc(in *content.UpdateItemRequest) (model.Item, error) {
+func ToDescFromUserItem(in model.UserItem) *content.UserItem {
+	return &content.UserItem{
+		Item:  ToDescFromItem(in.Item),
+		Value: content.Value(in.Value),
+	}
+}
+
+func ToDescFromUserItems(in []model.UserItem) []*content.UserItem {
+	userItems := make([]*content.UserItem, len(in))
+	for i, userItem := range in {
+		userItems[i] = ToDescFromUserItem(userItem)
+	}
+	return userItems
+}
+
+func UpdateItemRequetToItem(in *content.UpdateItemRequest) (model.Item, error) {
 	itemID, err := model.ItemIDFromString(in.GetItemId())
 	if err != nil {
 		return model.Item{}, fmt.Errorf("convert str to item id: %w", err)

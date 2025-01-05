@@ -20,13 +20,13 @@ func (i *Implementation) GetList(ctx context.Context, req *content.GetListReques
 		return nil, status.Errorf(codes.InvalidArgument, "invalid user id: %v", err)
 	}
 
-	items, err := i.UserContentService.GetList(ctx, userID, model.ContentType(req.GetContentType()))
+	userItems, err := i.UserContentService.GetList(ctx, userID, model.ContentType(req.GetContentType()))
 	if err != nil {
 		return nil, convertor.ConvertError(err)
 	}
 
 	return &content.GetListResponse{
-		Items: convertor.ToDescFromItems(items),
+		UserItems: convertor.ToDescFromUserItems(userItems),
 	}, nil
 
 }

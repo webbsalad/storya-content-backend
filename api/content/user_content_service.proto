@@ -43,7 +43,7 @@ message GetListRequest {
 }
 
 message GetListResponse {
-    repeated Item items = 1;
+    repeated UserItem userItems = 1;
 }
 
 message GetValuedRequest {
