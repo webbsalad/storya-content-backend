@@ -90,14 +90,14 @@ func (r *Repository) Get(ctx context.Context, itemID model.ItemID, contentType m
 	return item, nil
 }
 
-func (r *Repository) GetList(ctx context.Context, userID model.UserID, contentType model.ContentType) ([]model.Item, error) {
+func (r *Repository) GetList(ctx context.Context, userID model.UserID, contentType model.ContentType) ([]model.UserItem, error) {
 	table := FromContentTypeToString(contentType)
-	var contentIDs []string
-	var items []model.Item
+	var userContent []UserItem
+	var userItems []model.UserItem
 
 	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 	contentQuery := psql.
-		Select("content_id").
+		Select("content_id", "value").
 		From("user_content").
 		Where(
 			sq.And{
@@ -111,20 +111,21 @@ func (r *Repository) GetList(ctx context.Context, userID model.UserID, contentTy
 		return nil, fmt.Errorf("build content query: %w", err)
 	}
 
-	if err = r.db.SelectContext(ctx, &contentIDs, q, args...); err != nil {
+	if err = r.db.SelectContext(ctx, &userContent, q, args...); err != nil {
 		return nil, fmt.Errorf("get content IDs: %w", err)
 	}
 
-	for _, contentID := range contentIDs {
+	for _, content := range userContent {
 		var storedItem Item
 		var tagIDs []string
 		var storedTags []Tag
+		var userItem model.UserItem
 
 		itemQuery := psql.
 			Select("*").
 			From(table).
 			Where(
-				sq.Eq{"id": contentID},
+				sq.Eq{"id": content.ItemID},
 			)
 
 		q, args, err = itemQuery.ToSql()
@@ -143,7 +144,7 @@ func (r *Repository) GetList(ctx context.Context, userID model.UserID, contentTy
 			Select("tag_id").
 			From(fmt.Sprintf("%s_tags", table)).
 			Where(
-				sq.Eq{fmt.Sprintf("%s_id", table): contentID},
+				sq.Eq{fmt.Sprintf("%s_id", table): content.ItemID},
 			)
 
 		q, args, err = tagsQuery.ToSql()
@@ -177,10 +178,12 @@ func (r *Repository) GetList(ctx context.Context, userID model.UserID, contentTy
 		}
 
 		item.Type = contentType
-		items = append(items, item)
+		userItem.Item = item
+		userItem.Value = model.Value(content.Value)
+		userItems = append(userItems, userItem)
 	}
 
-	return items, nil
+	return userItems, nil
 }
 
 func (r *Repository) GetRand(ctx context.Context, contentType model.ContentType, count int32) ([]model.Item, error) {

@@ -26,8 +26,13 @@ message Item {
     repeated Tag tags = 6;
 }
 
+message UserItem {
+    Item item = 1;
+    Value value = 2;
+}
+
 enum Value {
     Like = 0;
     Neutral = 1;
-    Dislike = 3;
+    Dislike = 2;
 }

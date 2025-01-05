@@ -10,6 +10,11 @@ type Item struct {
 	Tags      []Tag
 }
 
+type UserItem struct {
+	ItemID string `db:"content_id"`
+	Value  int    `db:"value"`
+}
+
 type Tag struct {
 	ID   string `db:"id"`
 	Name string `db:"name"`

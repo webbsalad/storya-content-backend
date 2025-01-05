@@ -15,7 +15,7 @@ func (i *Implementation) Update(ctx context.Context, req *content.UpdateItemRequ
 		return nil, status.Errorf(codes.InvalidArgument, "invalid request: %v", err)
 	}
 
-	item, err := convertor.UpdateItemRequetToDesc(req)
+	item, err := convertor.UpdateItemRequetToItem(req)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid argument: %v", err)
 	}

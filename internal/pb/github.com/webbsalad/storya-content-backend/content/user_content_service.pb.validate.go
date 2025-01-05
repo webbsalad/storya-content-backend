@@ -182,7 +182,7 @@ func (m *GetListResponse) validate(all bool) error {
 
 	var errors []error
 
-	for idx, item := range m.GetItems() {
+	for idx, item := range m.GetUserItems() {
 		_, _ = idx, item
 
 		if all {
@@ -190,7 +190,7 @@ func (m *GetListResponse) validate(all bool) error {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, GetListResponseValidationError{
-						field:  fmt.Sprintf("Items[%v]", idx),
+						field:  fmt.Sprintf("UserItems[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -198,7 +198,7 @@ func (m *GetListResponse) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, GetListResponseValidationError{
-						field:  fmt.Sprintf("Items[%v]", idx),
+						field:  fmt.Sprintf("UserItems[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -207,7 +207,7 @@ func (m *GetListResponse) validate(all bool) error {
 		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return GetListResponseValidationError{
-					field:  fmt.Sprintf("Items[%v]", idx),
+					field:  fmt.Sprintf("UserItems[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
