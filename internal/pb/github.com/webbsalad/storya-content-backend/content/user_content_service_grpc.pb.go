@@ -32,7 +32,7 @@ const (
 type UserContentServiceClient interface {
 	GetUserItems(ctx context.Context, in *GetUserItemsRequest, opts ...grpc.CallOption) (*GetUserItemsResponse, error)
 	GetValued(ctx context.Context, in *GetValuedRequest, opts ...grpc.CallOption) (*GetValuedResponse, error)
-	Add(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Add(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*AddResponse, error)
 	Remove(ctx context.Context, in *RemoveItemRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -64,9 +64,9 @@ func (c *userContentServiceClient) GetValued(ctx context.Context, in *GetValuedR
 	return out, nil
 }
 
-func (c *userContentServiceClient) Add(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *userContentServiceClient) Add(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*AddResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
+	out := new(AddResponse)
 	err := c.cc.Invoke(ctx, UserContentService_Add_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -90,7 +90,7 @@ func (c *userContentServiceClient) Remove(ctx context.Context, in *RemoveItemReq
 type UserContentServiceServer interface {
 	GetUserItems(context.Context, *GetUserItemsRequest) (*GetUserItemsResponse, error)
 	GetValued(context.Context, *GetValuedRequest) (*GetValuedResponse, error)
-	Add(context.Context, *AddRequest) (*emptypb.Empty, error)
+	Add(context.Context, *AddRequest) (*AddResponse, error)
 	Remove(context.Context, *RemoveItemRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedUserContentServiceServer()
 }
@@ -108,7 +108,7 @@ func (UnimplementedUserContentServiceServer) GetUserItems(context.Context, *GetU
 func (UnimplementedUserContentServiceServer) GetValued(context.Context, *GetValuedRequest) (*GetValuedResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetValued not implemented")
 }
-func (UnimplementedUserContentServiceServer) Add(context.Context, *AddRequest) (*emptypb.Empty, error) {
+func (UnimplementedUserContentServiceServer) Add(context.Context, *AddRequest) (*AddResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Add not implemented")
 }
 func (UnimplementedUserContentServiceServer) Remove(context.Context, *RemoveItemRequest) (*emptypb.Empty, error) {

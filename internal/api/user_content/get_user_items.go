@@ -17,7 +17,7 @@ func (i *Implementation) GetUserItems(ctx context.Context, req *content.GetUserI
 
 	userID, err := model.UserIDFromString(req.GetUserId())
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid user id: %v", err)
+		return nil, status.Errorf(codes.InvalidArgument, "invalid data: %v", err)
 	}
 
 	userItems, err := i.UserContentService.GetUserItems(ctx, userID, model.ContentType(req.GetContentType()))

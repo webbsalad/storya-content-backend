@@ -580,6 +580,18 @@ func (m *AddRequest) validate(all bool) error {
 
 	var errors []error
 
+	if err := m._validateUuid(m.GetUserID()); err != nil {
+		err = AddRequestValidationError{
+			field:  "UserID",
+			reason: "value must be a valid UUID",
+			cause:  err,
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if err := m._validateUuid(m.GetItemId()); err != nil {
 		err = AddRequestValidationError{
 			field:  "ItemId",
@@ -680,6 +692,125 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AddRequestValidationError{}
+
+// Validate checks the field values on AddResponse with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *AddResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddResponse with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in AddResponseMultiError, or
+// nil if none found.
+func (m *AddResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if err := m._validateUuid(m.GetItemId()); err != nil {
+		err = AddResponseValidationError{
+			field:  "ItemId",
+			reason: "value must be a valid UUID",
+			cause:  err,
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return AddResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+func (m *AddResponse) _validateUuid(uuid string) error {
+	if matched := _user_content_service_uuidPattern.MatchString(uuid); !matched {
+		return errors.New("invalid uuid format")
+	}
+
+	return nil
+}
+
+// AddResponseMultiError is an error wrapping multiple validation errors
+// returned by AddResponse.ValidateAll() if the designated constraints aren't met.
+type AddResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddResponseMultiError) AllErrors() []error { return m }
+
+// AddResponseValidationError is the validation error returned by
+// AddResponse.Validate if the designated constraints aren't met.
+type AddResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddResponseValidationError) ErrorName() string { return "AddResponseValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AddResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddResponseValidationError{}
 
 // Validate checks the field values on RemoveItemRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, the

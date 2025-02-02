@@ -14,4 +14,6 @@ var (
 var (
 	ErrTypeNotFound = fmt.Errorf("content type not found: %w", ErrNotFound)
 	ErrItemNotFound = fmt.Errorf("item not found: %w", ErrNotFound)
+
+	ErrUserContentAlreadyExist = fmt.Errorf("user content already exist: %w", ErrAlreadyExist)
 )

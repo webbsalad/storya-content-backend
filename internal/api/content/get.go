@@ -17,7 +17,7 @@ func (i *Implementation) Get(ctx context.Context, req *content.GetItemRequest) (
 
 	itemID, err := model.ItemIDFromString(req.GetItemId())
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid argument: %v", err)
+		return nil, status.Errorf(codes.InvalidArgument, "invalid data: %v", err)
 	}
 
 	item, err := i.ContentService.Get(ctx, itemID, model.ContentType(req.GetContentType()))
