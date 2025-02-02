@@ -527,6 +527,37 @@ func (r *Repository) Create(ctx context.Context, item model.Item, contentType mo
 	return item, nil
 }
 
+func (r *Repository) Add(ctx context.Context, userID model.UserID, itemID model.ItemID, contentType model.ContentType, value model.Value) (model.ItemID, error) {
+	var strItemID string
+
+	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+	query := psql.
+		Insert("user_content").
+		Columns("user_id", "content_id", "content_type", "value", "created_at").
+		Values(userID.String(), itemID.String(), contentType, value, time.Now()).
+		Suffix("ON CONFLICT (user_id, content_id, content_type) DO NOTHING RETURNING id")
+
+	q, args, err := query.ToSql()
+	if err != nil {
+		return model.ItemID{}, fmt.Errorf("build query: %w", err)
+	}
+
+	err = r.db.GetContext(ctx, &strItemID, q, args...)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return model.ItemID{}, model.ErrUserContentAlreadyExist
+		}
+		return model.ItemID{}, fmt.Errorf("add user item: %w", err)
+	}
+
+	storedItem, err := model.ItemIDFromString(strItemID)
+	if err != nil {
+		return model.ItemID{}, fmt.Errorf("convert str to item id: %w", err)
+	}
+
+	return storedItem, nil
+}
+
 func (r *Repository) Update(ctx context.Context, item model.Item, contentType model.ContentType) (model.Item, error) {
 	table := FromContentTypeToString(contentType)
 

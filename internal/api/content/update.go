@@ -17,7 +17,7 @@ func (i *Implementation) Update(ctx context.Context, req *content.UpdateItemRequ
 
 	item, err := convertor.UpdateItemRequetToItem(req)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid argument: %v", err)
+		return nil, status.Errorf(codes.InvalidArgument, "invalid data: %v", err)
 	}
 
 	updatedItem, err := i.ContentService.Update(ctx, item, model.ContentType(req.GetType()))
